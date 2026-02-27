@@ -1,6 +1,6 @@
 from datetime import date, time, datetime
 from decimal import Decimal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class EventoBase(BaseModel):
@@ -17,7 +17,28 @@ class EventoBase(BaseModel):
 
 
 class EventoCreate(EventoBase):
-    pass
+    @model_validator(mode="after")
+    def validate_horarios_e_data(self) -> "EventoCreate":
+        hoje = date.today()
+        agora = datetime.now().time()
+
+        if self.data < hoje:
+            raise ValueError(
+                f"A data do evento ({self.data}) não pode ser no passado."
+            )
+
+        if self.horario_fim <= self.horario_inicio:
+            raise ValueError(
+                f"horario_fim ({self.horario_fim}) deve ser posterior ao horario_inicio ({self.horario_inicio})."
+            )
+
+        if self.data == hoje and self.horario_inicio < agora:
+            raise ValueError(
+                f"Para eventos hoje ({hoje}), o horario_inicio ({self.horario_inicio}) não pode ser no passado "
+                f"(agora são {agora.strftime('%H:%M')})."
+            )
+
+        return self
 
 
 class EventoResponse(EventoBase):

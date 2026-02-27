@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -7,7 +8,18 @@ from database import get_db
 from models import Evento
 from schemas import EventoCreate, EventoResponse
 
-app = FastAPI(title="Event Registry API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Run migrations and seed on startup
+    import subprocess
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
+    from seed import seed
+    seed()
+    yield
+
+
+app = FastAPI(title="Event Registry API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
