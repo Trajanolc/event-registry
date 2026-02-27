@@ -72,6 +72,15 @@ docker compose down
 docker compose down -v
 ```
 
+## Testes
+
+Ainda não há testes automatizados configurados neste projeto. Testes manuais são feitos via a documentação interativa da API (Swagger) em `http://localhost:8000/docs`.
+
+Para adicionar testes futuramente:
+
+- **Backend (Python):** adicione `pytest` e `httpx` ao `backend/requirements.txt` e crie arquivos `test_*.py`
+- **Frontend (Next.js):** adicione `jest` e `@testing-library/react` ao `frontend/package.json`
+
 ## Estrutura do projeto
 
 ```
