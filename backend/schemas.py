@@ -1,5 +1,6 @@
 from datetime import date, time, datetime
 from decimal import Decimal
+from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -46,3 +47,28 @@ class EventoResponse(EventoBase):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class CurrentEventData(BaseModel):
+    nome: Optional[str] = None
+    tipo: Optional[str] = None
+    data: Optional[str] = None
+    horario_inicio: Optional[str] = None
+    horario_fim: Optional[str] = None
+    local: Optional[str] = None
+    descricao: Optional[str] = None
+    valor_ingresso: Optional[str] = None
+    capacidade: Optional[int] = None
+    organizador: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+    current_event_data: CurrentEventData = Field(default_factory=CurrentEventData)
+
+
+class ChatResponse(BaseModel):
+    message: str
+    current_event_data: CurrentEventData
+    status: str

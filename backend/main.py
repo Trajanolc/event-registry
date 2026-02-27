@@ -6,7 +6,8 @@ from typing import List
 
 from database import get_db
 from models import Evento
-from schemas import EventoCreate, EventoResponse
+from schemas import EventoCreate, EventoResponse, ChatRequest, ChatResponse
+from chat import process_chat
 
 
 @asynccontextmanager
@@ -55,3 +56,16 @@ def get_evento(evento_id: int, db: Session = Depends(get_db)):
     if not evento:
         raise HTTPException(status_code=404, detail="Evento não encontrado")
     return evento
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(request: ChatRequest):
+    try:
+        result = process_chat(
+            session_id=request.session_id,
+            message=request.message,
+            current_event_data=request.current_event_data.model_dump(exclude_none=False),
+        )
+        return ChatResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
